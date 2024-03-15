@@ -1,2 +1,2 @@
 # Bob-s-Beagles-BE
-Backend of the Bob's Beagles Eccomerce App
+Backend of the Bob's Beagles Ecommerce App
