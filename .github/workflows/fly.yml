@@ -4,16 +4,36 @@ on:
     types: closed
 
 jobs:
-  deploy:
+  build-and-deploy:
     if: github.event.pull_request.merged == true
-    name: "Deploy to fly"
+    name: "Build api and deploy to fly"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: flyctl deploy --remote-only
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v3
+
+      - name: Execute Gradle build
+        run: |
+          chmod +x gradlew
+          ./gradlew build -x test
+          mv build/libs/backend-0.0.1-SNAPSHOT.jar ./backend-0.0.1-SNAPSHOT.jar
         env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DATABASE_USER: ${{ secrets.DATABASE_USER }}
           DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+
+      - name: Build Docker image
+        run: |
+          docker build -t bobs-beagles-backend .
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Deploy to Fly
+        run: |
+          flyctl auth login --access-token "${{ secrets.FLY_API_TOKEN }}"
+          flyctl deploy --remote-only
