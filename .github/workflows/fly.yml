@@ -22,13 +22,11 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew build -x test
+          mv build/libs/backend-0.0.1-SNAPSHOT.jar ./backend-0.0.1-SNAPSHOT.jar
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DATABASE_USER: ${{ secrets.DATABASE_USER }}
           DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-
-      - name: Copy Jar file
-        run: mv build/libs/$(ls build/libs) backend-0.0.1-SNAPSHOT.jar
 
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - run: flyctl deploy --remote-only
