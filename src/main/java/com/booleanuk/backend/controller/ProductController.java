@@ -36,4 +36,19 @@ public class ProductController {
         productResponse.set(product);
         return ResponseEntity.ok(productResponse);
     }
+
+    // Admin endpoints \/
+    @PostMapping
+    public ResponseEntity<Response<?>> create(@RequestBody Product product) {
+        ProductResponse productResponse = new ProductResponse();
+        try {
+            productResponse.set(this.productRepository.save(product));
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("Bad request");
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(productResponse, HttpStatus.CREATED);
+    }
+
 }
