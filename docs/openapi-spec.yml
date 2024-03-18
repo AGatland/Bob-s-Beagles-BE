@@ -2,6 +2,9 @@ openapi: 3.0.3
 info:
   title: Bobs Beagles API
   version: 1.0.0
+  contact:
+    name: Current Group Lead
+  description: Ecommerce Application for a pet shop
 servers:
   - url: http://localhost:4000
 tags:
@@ -238,7 +241,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotFoundError'
-  paths:
   /users:
     get:
       tags:
@@ -681,6 +683,10 @@ components:
         consent_spam:
           type: boolean
           example: true
+    UserList:
+      type: array
+      items:
+        $ref: '#/components/schemas/User'
     UpdateUser:
       type: object
       properties:
