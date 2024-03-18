@@ -65,4 +65,29 @@ public class ProductController {
         return ResponseEntity.ok(productResponse);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Response<?>> update(@PathVariable int id, @RequestBody Product product) {
+        Product productToUpdate = this.productRepository.findById(id).orElse(null);
+        if (productToUpdate == null) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("Product Not Found");
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
+
+        productToUpdate.setName(product.getName());
+        productToUpdate.setCategory(product.getCategory());
+        productToUpdate.setPrice(product.getPrice());
+        productToUpdate.setDescription(product.getDescription());
+        productToUpdate.setImg(product.getImg());
+
+        ProductResponse productResponse = new ProductResponse();
+        try {
+            productResponse.set(this.productRepository.save(productToUpdate));
+        } catch (Exception e) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("Bad request");
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(productResponse, HttpStatus.CREATED);
+    }
 }
