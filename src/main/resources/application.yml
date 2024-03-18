@@ -8,12 +8,11 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://DATABASE_URL:5432/DATABASE_NAME
-    username: DATABASE_USER
-    password: DATABASE_PASSWORD
-    hikari:
-      maximum-pool-size: 3
-      minimum-idle: 3
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
+    max-active: 3
+    max-idle: 3
   jpa:
     hibernate:
       ddl-auto: update
