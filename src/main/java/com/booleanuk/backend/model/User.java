@@ -65,6 +65,7 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"))
     @MapKeyJoinColumn(name = "product_id")
     @Column(name = "quantity")
+    @JsonIgnore
     private Map<Product, Integer> basket = new HashMap<>();
 
     @OneToMany(mappedBy = "user")
