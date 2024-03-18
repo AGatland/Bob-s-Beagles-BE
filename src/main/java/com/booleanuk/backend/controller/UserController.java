@@ -5,7 +5,6 @@ import com.booleanuk.backend.model.dto.UserDTO;
 import com.booleanuk.backend.payload.response.ErrorResponse;
 import com.booleanuk.backend.payload.response.Response;
 import com.booleanuk.backend.repository.UserRepository;
-import org.apache.catalina.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +15,6 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     @Autowired
     private UserRepository userRepository;
-
-    private Mapper mapper;
 
     @GetMapping("/{id}")
     public ResponseEntity<Response<?>> getUserById(@PathVariable int id) {
