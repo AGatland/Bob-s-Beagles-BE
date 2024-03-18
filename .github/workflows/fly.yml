@@ -4,8 +4,9 @@ on:
     types: closed
 
 jobs:
-  build:
+  build-and-deploy:
     if: github.event.pull_request.merged == true
+    name: "Build api and deploy to fly"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,6 +20,7 @@ jobs:
 
       - name: Execute Gradle build
         run: |
+          chmod +x gradlew
           ./gradlew build -x test
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -27,22 +29,6 @@ jobs:
 
       - name: Copy Jar file
         run: mv build/libs/$(ls build/libs) backend-0.0.1-SNAPSHOT.jar
-
-      - uses: actions/upload-artifact@master
-        with:
-          name: jar-file
-          path: backend-0.0.1-SNAPSHOT.jar
-
-  deploy:
-    name: "Deploy to fly"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/download-artifact@master
-        with:
-          name: jar-file
-          path: backend-0.0.1-SNAPSHOT.jar
 
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - run: flyctl deploy --remote-only
