@@ -51,4 +51,18 @@ public class ProductController {
         return new ResponseEntity<>(productResponse, HttpStatus.CREATED);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Response<?>> delete(@PathVariable int id) {
+        Product productToDelete = this.productRepository.findById(id).orElse(null);
+        if (productToDelete == null) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("Product Not Found");
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
+        this.productRepository.delete(productToDelete);
+        ProductResponse productResponse = new ProductResponse();
+        productResponse.set(productToDelete);
+        return ResponseEntity.ok(productResponse);
+    }
+
 }
