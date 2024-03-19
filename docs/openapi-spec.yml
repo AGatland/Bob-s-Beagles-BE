@@ -3,14 +3,13 @@ info:
   title: Bobs Beagles API
   version: 1.0.0
   contact:
-    name: Current Group Lead
+    name: me?
   description: Ecommerce Application for a pet shop
 servers:
   - url: http://localhost:4000
 tags:
   - name: auth
   - name: products
-  - name: inventory
   - name: users
   - name: orders
   - name: basket
@@ -42,7 +41,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/BadRequestError'
 
-  /auth/login:
+  /auth/signin:
     post:
       tags:
         - auth
@@ -53,14 +52,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LoginUser'
+              $ref: '#/components/schemas/SigninUser'
       responses:
         '200':
           description: Login successful
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/JwtRes'
         '401':
           description: Unauthorized
           content:
@@ -198,64 +197,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequestError'
-
-  /inventory:
-    get:
-      tags:
-        - inventory
-      summary: Get all inventory items
-      description: Get a list of all items in inventory.
-      operationId: getAllInventoryItems
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InventoryItemList'
-          description: Successful response
-
-  /inventory/{sku}:
-    get:
-      tags:
-        - inventory
-      summary: Get inventory item details
-      description: Get details of a specific item in inventory.
-      operationId: getInventoryItem
-      parameters:
-        - name: sku
-          in: path
-          description: The SKU of the item in inventory to retrieve
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InventoryItem'
-          description: Successful response
-        '404':
-          description: Inventory item not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundError'
-  /users:
-    get:
-      tags:
-        - users
-      summary: Get all users
-      description: Retrieve a list of all users.
-      operationId: getAllUsers
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserList'
-
   /users/{id}:
     get:
       tags:
@@ -359,7 +300,7 @@ paths:
       parameters:
         - name: userId
           in: path
-          description: The ID of the user to retrieve
+          description: The ID of the user to retrieve all orders for
           required: true
           schema:
             type: string
@@ -380,7 +321,7 @@ paths:
       parameters:
         - name: userId
           in: path
-          description: The ID of the user to retrieve
+          description: The ID of the user to add order for
           required: true
           schema:
             type: string
@@ -403,7 +344,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/BadRequestError'
 
-  /orders/{orderId}:
+  /users/{userId}/orders/{orderId}:
     get:
       tags:
         - orders
@@ -414,6 +355,12 @@ paths:
         - name: orderId
           in: path
           description: The ID of the order to retrieve
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          description: The ID of the user to retrieve a specific order for
           required: true
           schema:
             type: string
@@ -435,7 +382,7 @@ paths:
       tags:
         - orders
       summary: Update an order
-      description: Update information about a specific order.
+      description: Update status on a specific order.
       operationId: updateOrder
       parameters:
         - name: orderId
@@ -444,11 +391,17 @@ paths:
           required: true
           schema:
             type: string
+        - name: userId
+          in: path
+          description: The ID of the user to update an order for
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateOrder'
+              $ref: '#/components/schemas/UpdateOrder'
       responses:
         '200':
           description: Order updated successfully
@@ -478,7 +431,7 @@ paths:
       parameters:
         - name: id
           in: path
-          description: The ID of the users basket to retrieve
+          description: The ID of the user whose basket to retrieve
           required: true
           schema:
             type: string
@@ -489,13 +442,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BasketList'
-  /basket:
     post:
       tags:
         - basket
       summary: Add item to basket
       description: Add an item to the user's basket.
       operationId: addItemToBasket
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the user whose basket to add to
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -507,7 +466,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BasketItem'
+                $ref: '#/components/schemas/BasketItemResponse'
         '400':
           description: Item fields not correct
           content:
@@ -520,6 +479,13 @@ paths:
       summary: Update item in basket
       description: Update the quantity of an item in the user's basket.
       operationId: updateItemInBasket
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the user whose basket to update to
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -531,7 +497,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BasketItem'
+                $ref: '#/components/schemas/BasketItemResponse'
         '400':
           description: Item fields not correct
           content:
@@ -545,13 +511,20 @@ paths:
       summary: Remove item from basket
       description: Remove an item from the user's basket.
       operationId: removeItemFromBasket
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the user whose basket to delete from
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Item removed from basket successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BasketItem'
+                $ref: '#/components/schemas/BasketItemResponse'
         '400':
           description: Item fields not correct
           content:
@@ -582,7 +555,7 @@ components:
           type: number
           format: double
           example: 20.99
-    Product:
+    ProductData:
       type: object
       properties:
         sku:
@@ -604,23 +577,18 @@ components:
           type: number
           format: double
           example: 20.99
+    Product:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        data:
+          $ref: '#/components/schemas/ProductData'
     AllProducts:
       type: array
       items:
         $ref: '#/components/schemas/Product'
-    InventoryItem:
-      type: object
-      properties:
-        product_sku:
-          type: string
-          example: "ABC123"
-        quantity:
-          type: integer
-          example: 10
-    InventoryItemList:
-      type: array
-      items:
-        $ref: '#/components/schemas/InventoryItem'
     SignupUser:
       type: object
       required: [firstName, lastName, email, password]
@@ -647,7 +615,7 @@ components:
         consent_spam:
           type: boolean
           example: true
-    LoginUser:
+    SigninUser:
       type: object
       required: [email, password]
       properties:
@@ -658,7 +626,27 @@ components:
         password:
           type: string
           example: "password123"
-    User:
+    JwtRes:
+      type: object
+      properties:
+        token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2hubnkuZGVwcEBleGFtcGxlLmNvbSIsImlhdCI6MTcxMDg0MTgzOCwiZXhwIjoxNzEwOTI4MjM4fQ.0HMjjPTR7s7ze3tadJCBgcekspWDpYxJgiWg-dPAdio"
+        type:
+          type: string
+          example: "Bearer "
+        id:
+          type: number
+          example: 1234567890
+        email:
+          type: string
+          example: "example@user.com"
+        roles:
+          type: array
+          items:
+            type: string
+            example: "ROLE_USER"
+    UserData:
       type: object
       properties:
         id:
@@ -683,10 +671,14 @@ components:
         consent_spam:
           type: boolean
           example: true
-    UserList:
-      type: array
-      items:
-        $ref: '#/components/schemas/User'
+    User:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        data:
+          $ref: '#/components/schemas/UserData'
     UpdateUser:
       type: object
       properties:
@@ -727,12 +719,19 @@ components:
               quantity:
                 type: integer
                 example: 2
-    Order:
+    UpdateOrder:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          example: "SENT"
+    OrderData:
       type: object
       properties:
         id:
-          type: string
-          example: "1234567890"
+          type: number
+          example: 1234567890
         status:
           type: string
           example: "Order received"
@@ -754,6 +753,14 @@ components:
               quantity:
                 type: integer
                 example: 2
+    Order:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        data:
+          $ref: '#/components/schemas/OrderData'
     OrderList:
       type: array
       items:
@@ -761,43 +768,60 @@ components:
     BadRequestError:
       type: object
       properties:
-        message:
+        status:
           type: string
-          example: "Bad Request"
+          example: "error"
+        data:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Bad Request"
     NotFoundError:
       type: object
       properties:
-        message:
+        status:
           type: string
-          example: "Not Found"
+          example: "error"
+        data:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Not Found"
     UnauthorizedError:
       type: object
       properties:
-        message:
+        status:
           type: string
-          example: "Unauthorized"
+          example: "error"
+        data:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Unauthorized"
     BasketItem:
       type: object
       properties:
-        userId:
-          type: string
-          example: "123"
         sku:
           type: string
           example: "ABC123"
         quantity:
           type: integer
           example: 2
-    BasketListItem:
+    BasketItemResponse:
       type: object
       properties:
-        sku:
+        status:
           type: string
-          example: "ABC123"
-        quantity:
-          type: integer
-          example: 2
+          example: "success"
+        data:
+          $ref: '#/components/schemas/BasketItem'
     BasketList:
-      type: array
-      items:
-        $ref: '#/components/schemas/BasketListItem'
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/BasketItem'
