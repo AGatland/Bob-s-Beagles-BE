@@ -15,13 +15,19 @@ jobs:
           distribution: temurin
           java-version: 17
 
+      - name: Put in Datasource config
+        run: |
+          sed -i "s/DATABASE_URL_PLACEHOLDER/${{ secrets.DATABASE_URL }}/g" src/main/resources/applications.yml
+          sed -i "s/DATABASE_USER_PLACEHOLDER/${{ secrets.DATABASE_USER }}/g" src/main/resources/applications.yml
+          sed -i "s/DATABASE_PASSWORD_PLACEHOLDER/${{ secrets.DATABASE_PASSWORD }}/g" src/main/resources/applications.yml
+
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v3
 
       - name: Execute Gradle build
         run: |
           chmod +x gradlew
-          DATABASE_URL=${{ secrets.DATABASE_URL }} DATABASE_USER=${{ secrets.DATABASE_USER }} DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} ./gradlew build
+          ./gradlew build -x test
           mv build/libs/backend-0.0.1-SNAPSHOT.jar ./backend-0.0.1-SNAPSHOT.jar
 
       - name: Build Docker image

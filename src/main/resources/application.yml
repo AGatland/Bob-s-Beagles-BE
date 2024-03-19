@@ -8,9 +8,9 @@ server:
 
 spring:
   datasource:
-    url: ${DATABASE_URL}
-    username: ${DATABASE_USER}
-    password: ${DATABASE_PASSWORD}
+    url: DATABASE_URL_PLACEHOLDER
+    username: DATABASE_USER_PLACEHOLDER
+    password: DATABASE_PASSWORD_PLACEHOLDER
     max-active: 3
     max-idle: 3
   jpa:
