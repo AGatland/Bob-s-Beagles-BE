@@ -16,6 +16,9 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    AuthService authService;
+
     @GetMapping("/{id}")
     public ResponseEntity<Response<?>> getUserById(@PathVariable int id) {
         User user = this.userRepository.findById(id).orElse(null);
@@ -33,7 +36,12 @@ public class UserController {
     }
 
     @PutMapping(value="/{id}", consumes="application/json")
-    public ResponseEntity<Response<?>> updateUser(@PathVariable int id, @RequestBody UserDTO userDTO) {
+    public ResponseEntity<Response<?>> updateUser(@PathVariable int id, @RequestBody UserDTO userDTO, @RequestHeader (name="Authorization") String token) {
+        if (!authService.hasAccessToResource(token, id)) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("This is not your basket");
+            return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+        }
         User userToUpdate = this.userRepository.findById(id).orElse(null);
         // 404 Not found
         if (userToUpdate == null) {
@@ -63,7 +71,12 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Response<?>> deleteUser(@PathVariable int id) {
+    public ResponseEntity<Response<?>> deleteUser(@PathVariable int id, @RequestHeader (name="Authorization") String token) {
+        if (!authService.hasAccessToResource(token, id)) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("This is not your basket");
+            return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+        }
         User userToDelete = this.userRepository.findById(id).orElse(null);
         // 404 Not found
         if (userToDelete == null) {
