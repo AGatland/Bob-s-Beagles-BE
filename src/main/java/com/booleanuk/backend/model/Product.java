@@ -1,5 +1,6 @@
 package com.booleanuk.backend.model;
 
+import com.booleanuk.backend.model.enums.EProductAnimalType;
 import com.booleanuk.backend.model.enums.EProductCategory;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
@@ -31,6 +32,10 @@ public class Product {
     @Column(name = "category", nullable = false)
     private EProductCategory category;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "animal_type", nullable = false)
+    private EProductAnimalType animalType;
+
     @Column(name = "img", nullable = false)
     private String img;
 
@@ -43,10 +48,11 @@ public class Product {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    public Product(String name, String description, EProductCategory category, String img, int price) {
+    public Product(String name, String description, EProductCategory category, EProductAnimalType animalType, String img, int price) {
         this.name = name;
         this.description = description;
         this.category = category;
+        this.animalType = animalType;
         this.img = img;
         this.price = price;
     }

@@ -76,6 +76,7 @@ public class ProductController {
 
         productToUpdate.setName(product.getName());
         productToUpdate.setCategory(product.getCategory());
+        productToUpdate.setAnimalType(product.getAnimalType());
         productToUpdate.setPrice(product.getPrice());
         productToUpdate.setDescription(product.getDescription());
         productToUpdate.setImg(product.getImg());
