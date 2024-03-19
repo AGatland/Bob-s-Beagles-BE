@@ -17,9 +17,9 @@ jobs:
 
       - name: Put in Datasource config
         run: |
-          sed -i "s/DATABASE_URL_PLACEHOLDER/${{ secrets.DATABASE_URL }}/g" src/main/resources/applications.yml
-          sed -i "s/DATABASE_USER_PLACEHOLDER/${{ secrets.DATABASE_USER }}/g" src/main/resources/applications.yml
-          sed -i "s/DATABASE_PASSWORD_PLACEHOLDER/${{ secrets.DATABASE_PASSWORD }}/g" src/main/resources/applications.yml
+          sed -i'' -e 's|DATABASE_URL_PLACEHOLDER|'"${{ secrets.DATABASE_URL }}"'|g' src/main/resources/applications.yml
+          sed -i'' -e 's|DATABASE_USER_PLACEHOLDER|'"${{ secrets.DATABASE_USER }}"'|g' src/main/resources/applications.yml
+          sed -i'' -e 's|DATABASE_PASSWORD_PLACEHOLDER|'"${{ secrets.DATABASE_PASSWORD }}"'|g' src/main/resources/applications.yml
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v3
