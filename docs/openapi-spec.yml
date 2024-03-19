@@ -619,7 +619,7 @@ components:
       type: object
       required: [email, password]
       properties:
-        email:
+        username:
           type: string
           format: email
           example: "john.doe@example.com"
