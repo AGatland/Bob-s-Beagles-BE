@@ -8,9 +8,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://mel.db.elephantsql.com:5432/xufnyvmn
-    username: xufnyvmn
-    password: Stv5sWuTiXOzxIzlERuiC3642po8BRgH
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
     max-active: 3
     max-idle: 3
   jpa:
