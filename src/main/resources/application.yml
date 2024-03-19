@@ -8,9 +8,9 @@ server:
 
 spring:
   datasource:
-    url: ${DATABASE_URL}
-    username: ${DATABASE_USER}
-    password: ${DATABASE_PASSWORD}
+    url: jdbc:postgresql://mel.db.elephantsql.com:5432/xufnyvmn
+    username: xufnyvmn
+    password: 63xs9fTU06mCKsT_KtjGhpZxWg-i4cX-
     max-active: 3
     max-idle: 3
   jpa:
@@ -21,3 +21,8 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     show-sql: true
+
+booleanuk:
+  app:
+    jwtSecret: ===============================BooleanUK=Spring==============================================
+    jwtExpirationMs: 86400000
