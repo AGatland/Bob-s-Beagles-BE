@@ -24,8 +24,16 @@ public class BasketController {
     @Autowired
     ProductRepository productRepository;
 
+    @Autowired
+    AuthService authService;
+
     @GetMapping("/{id}")
-    public ResponseEntity<Response<?>> getAll(@PathVariable int id) {
+    public ResponseEntity<Response<?>> getAll(@PathVariable int id, @RequestHeader (name="Authorization") String token) {
+        if (!authService.hasAccessToResource(token, id)) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("This is not your basket");
+            return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+        }
         User user = this.userRepository.findById(id).orElse(null);
         // 404 Not found
         if (user == null) {
@@ -44,7 +52,12 @@ public class BasketController {
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<Response<?>> create(@PathVariable int id, @RequestBody BasketItemDTO basketItemDTO) {
+    public ResponseEntity<Response<?>> create(@PathVariable int id, @RequestBody BasketItemDTO basketItemDTO, @RequestHeader (name="Authorization") String token) {
+        if (!authService.hasAccessToResource(token, id)) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("This is not your basket");
+            return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+        }
         User user = this.userRepository.findById(id).orElse(null);
         // 404 Not found
         if (user == null) {
@@ -76,7 +89,12 @@ public class BasketController {
 
     // Same code as for post request because basket is a HashMap
     @PutMapping("/{id}")
-    public ResponseEntity<Response<?>> update(@PathVariable int id, @RequestBody BasketItemDTO basketItemDTO) {
+    public ResponseEntity<Response<?>> update(@PathVariable int id, @RequestBody BasketItemDTO basketItemDTO, @RequestHeader (name="Authorization") String token) {
+        if (!authService.hasAccessToResource(token, id)) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("This is not your basket");
+            return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+        }
         User user = this.userRepository.findById(id).orElse(null);
         // 404 Not found
         if (user == null) {
@@ -107,7 +125,12 @@ public class BasketController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Response<?>> delete(@PathVariable int id, @RequestBody BasketItemDTO basketItemDTO) {
+    public ResponseEntity<Response<?>> delete(@PathVariable int id, @RequestBody BasketItemDTO basketItemDTO, @RequestHeader (name="Authorization") String token) {
+        if (!authService.hasAccessToResource(token, id)) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("This is not your basket");
+            return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+        }
         User user = this.userRepository.findById(id).orElse(null);
         // 404 Not found
         if (user == null) {

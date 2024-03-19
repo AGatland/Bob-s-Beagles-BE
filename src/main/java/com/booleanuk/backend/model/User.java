@@ -29,6 +29,8 @@ public class User {
     @Email
     private String email;
 
+    private String username;
+
     @NotBlank
     @Size(max = 120)
     private String password;
@@ -74,6 +76,7 @@ public class User {
 
     public User(String email, String firstName, String lastName, String password, String phone, String address, boolean consentSpam) {
         this.email = email;
+        this.username = email;
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
