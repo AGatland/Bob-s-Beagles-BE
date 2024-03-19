@@ -4,6 +4,7 @@ import com.booleanuk.backend.model.User;
 import com.booleanuk.backend.model.dto.UserDTO;
 import com.booleanuk.backend.payload.response.ErrorResponse;
 import com.booleanuk.backend.payload.response.Response;
+import com.booleanuk.backend.payload.response.UserDtoResponse;
 import com.booleanuk.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,9 +30,8 @@ public class UserController {
             return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
         // Success response of user with the specific ID, not including password, roles, basket and orders
-        UserDTO userDTO = this.covertToDTO(user);
-        Response<UserDTO> response = new Response<>();
-        response.set(userDTO);
+        UserDtoResponse response = new UserDtoResponse();
+        response.set(this.covertToDTO(user));
         return ResponseEntity.ok(response);
     }
 
@@ -64,9 +64,8 @@ public class UserController {
         userToUpdate.setConsentSpam(userDTO.isConsentSpam());
         // Success response of updated user, not including password, roles, basket and orders
         this.userRepository.save(userToUpdate);
-        UserDTO updatedUserDTO = this.covertToDTO(userToUpdate);
-        Response<UserDTO> response = new Response<>();
-        response.set(updatedUserDTO);
+        UserDtoResponse response = new UserDtoResponse();
+        response.set(this.covertToDTO(userToUpdate));
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -87,9 +86,8 @@ public class UserController {
         // Deletes user with specified ID
         this.userRepository.delete(userToDelete);
         // Success response of deleted user, not including password, roles, basket and orders
-        UserDTO deletedUserDTO = this.covertToDTO(userToDelete);
-        Response<UserDTO> response = new Response<>();
-        response.set(deletedUserDTO);
+        UserDtoResponse response = new UserDtoResponse();
+        response.set(this.covertToDTO(userToDelete));
         return ResponseEntity.ok(response);
     }
 
