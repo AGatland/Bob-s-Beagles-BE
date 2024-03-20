@@ -1,10 +1,12 @@
 package com.booleanuk.backend.controller;
 
+import com.booleanuk.backend.model.dto.UserDTO;
 import com.booleanuk.backend.model.enums.ERole;
 import com.booleanuk.backend.model.Role;
 import com.booleanuk.backend.model.User;
 import com.booleanuk.backend.payload.request.LoginRequest;
 import com.booleanuk.backend.payload.request.SignupRequest;
+import com.booleanuk.backend.payload.response.ErrorResponse;
 import com.booleanuk.backend.payload.response.JwtResponse;
 import com.booleanuk.backend.payload.response.MessageResponse;
 import com.booleanuk.backend.repository.RoleRepository;
@@ -55,11 +57,17 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map((item) -> item.getAuthority()).collect(Collectors.toList());
+        User user = this.userRepository.findById(userDetails.getId()).orElse(null);
 
-        return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getId(),
-                 userDetails.getEmail(), roles));
+        if (user == null) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("User not found");
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
+
+        return ResponseEntity.ok(new JwtResponse(jwt, new UserDTO(user.getId(), user.getFirstName(),
+                user.getLastName(), user.getEmail(), user.getPhone(),
+                user.getAddress(), user.isConsentSpam())));
     }
 
     @PostMapping("/signup")
