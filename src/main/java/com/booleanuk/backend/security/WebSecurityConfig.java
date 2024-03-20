@@ -54,21 +54,15 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .cors((cors) -> cors.disable())
                 .csrf((csrf) -> csrf.disable())
                 .exceptionHandling((exception) -> exception.authenticationEntryPoint((this.unauthorizedHandler)))
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/users/**").permitAll()
-                        .requestMatchers("/products/**").permitAll()
-                        .requestMatchers("/basket/**").permitAll()
-                        /*
                         .requestMatchers(HttpMethod.GET,"/products/**").hasRole("USER")
                         .requestMatchers("/users/**").hasRole("USER")
                         .requestMatchers("/products/**").hasRole("ADMIN")
                         .requestMatchers("/basket/**").hasRole("USER")
-                         */
-
                 );
         http.authenticationProvider(this.authenticationProvider());
         http.addFilterBefore(this.authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
