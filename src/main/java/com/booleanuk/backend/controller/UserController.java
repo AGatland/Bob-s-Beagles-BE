@@ -22,7 +22,12 @@ public class UserController {
     AuthService authService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<Response<?>> getUserById(@PathVariable int id) {
+    public ResponseEntity<Response<?>> getUserById(@PathVariable int id, @RequestHeader (name="Authorization") String token) {
+        if (!authService.hasAccessToResource(token, id)) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("This is not your basket");
+            return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+        }
         User user = this.userRepository.findById(id).orElse(null);
         // 404 Not found
         if (user == null) {
