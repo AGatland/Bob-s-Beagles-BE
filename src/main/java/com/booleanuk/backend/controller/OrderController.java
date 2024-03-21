@@ -117,7 +117,7 @@ public class OrderController {
 
     @PutMapping("/{orderId}")
     public ResponseEntity<Response<?>> update(@PathVariable int orderId, @RequestBody StatusDTO status, @RequestHeader (name="Authorization") String token) {
-        if (authService.isAdminUser(token)) {
+        if (!authService.isAdminUser(token)) {
             ErrorResponse error = new ErrorResponse();
             error.set("You do not have access to edit orders");
             return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
