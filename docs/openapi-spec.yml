@@ -10,9 +10,17 @@ servers:
 tags:
   - name: auth
   - name: products
+    description:
+      Users can only access GET endpoints
   - name: users
+    description:
+        Users can only access their own user
   - name: orders
+    description:
+      Users can only access their own orders, PUT is only for admins
   - name: basket
+    description:
+        Users can only access their own basket
 
 paths:
   /auth/signup:
@@ -518,6 +526,11 @@ paths:
           required: true
           schema:
             type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BasketItem'
       responses:
         '200':
           description: Item removed from basket successfully
@@ -586,9 +599,15 @@ components:
         data:
           $ref: '#/components/schemas/ProductData'
     AllProducts:
-      type: array
-      items:
-        $ref: '#/components/schemas/Product'
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductData'
     SignupUser:
       type: object
       required: [firstName, lastName, email, password]
@@ -619,7 +638,7 @@ components:
       type: object
       required: [email, password]
       properties:
-        username:
+        email:
           type: string
           format: email
           example: "john.doe@example.com"
@@ -632,15 +651,8 @@ components:
         token:
           type: string
           example: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2hubnkuZGVwcEBleGFtcGxlLmNvbSIsImlhdCI6MTcxMDg0MTgzOCwiZXhwIjoxNzEwOTI4MjM4fQ.0HMjjPTR7s7ze3tadJCBgcekspWDpYxJgiWg-dPAdio"
-        type:
-          type: string
-          example: "Bearer "
-        id:
-          type: number
-          example: 1234567890
-        email:
-          type: string
-          example: "example@user.com"
+        user:
+          $ref: '#/components/schemas/UserData'
         roles:
           type: array
           items:
@@ -818,10 +830,15 @@ components:
           example: "success"
         data:
           $ref: '#/components/schemas/BasketItem'
+    BasketListData:
+      type: array
+      items:
+        $ref: '#/components/schemas/BasketItem'
     BasketList:
       type: object
       properties:
+        status:
+          type: string
+          example: "error"
         data:
-          type: array
-          items:
-            $ref: '#/components/schemas/BasketItem'
+          $ref: '#/components/schemas/BasketListData'
