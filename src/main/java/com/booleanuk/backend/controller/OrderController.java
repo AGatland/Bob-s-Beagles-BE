@@ -45,7 +45,7 @@ public class OrderController {
     public ResponseEntity<Response<?>> getAll(@PathVariable int userid, @RequestHeader (name="Authorization") String token) {
         if (!authService.hasAccessToResource(token, userid)) {
             ErrorResponse error = new ErrorResponse();
-            error.set("This is not your basket");
+            error.set("These are not your orders");
             return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
         }
         List<Order> orders = this.orderRepository.findAll().stream().filter(order -> order.getUser().getId() == userid).toList();
@@ -60,7 +60,7 @@ public class OrderController {
     public ResponseEntity<Response<?>> create(@PathVariable int userid, @RequestBody ProductsInOrderDTO productsInOrderDTO, @RequestHeader (name="Authorization") String token) {
         if (!authService.hasAccessToResource(token, userid)) {
             ErrorResponse error = new ErrorResponse();
-            error.set("This is not your basket");
+            error.set("These are not your orders");
             return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
         }
         User user = this.userRepository.findById(userid).orElse(null);
@@ -98,17 +98,17 @@ public class OrderController {
 
     // Get a specific order
     @GetMapping("/{orderId}")
-    public ResponseEntity<Response<?>> getSpecific(@PathVariable int orderId, @PathVariable int userid, @RequestHeader (name="Authorization") String token) {
-        if (!authService.hasAccessToResource(token, userid)) {
-            ErrorResponse error = new ErrorResponse();
-            error.set("This is not your basket");
-            return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
-        }
+    public ResponseEntity<Response<?>> getSpecific(@PathVariable int orderId, @RequestHeader (name="Authorization") String token) {
         Order order = this.orderRepository.findById(orderId).orElse(null);
         if (order == null) {
             ErrorResponse error = new ErrorResponse();
             error.set("Order not found");
             return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
+        if (!authService.hasAccessToResource(token, order.getUser().getId())) {
+            ErrorResponse error = new ErrorResponse();
+            error.set("This is not your order");
+            return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
         }
         OrderResponse response = new OrderResponse();
         response.set(this.covertOrderToDTO(order));
@@ -116,10 +116,10 @@ public class OrderController {
     }
 
     @PutMapping("/{orderId}")
-    public ResponseEntity<Response<?>> update(@PathVariable int orderId, @RequestBody StatusDTO status, @PathVariable int userid, @RequestHeader (name="Authorization") String token) {
-        if (!authService.hasAccessToResource(token, userid)) {
+    public ResponseEntity<Response<?>> update(@PathVariable int orderId, @RequestBody StatusDTO status, @RequestHeader (name="Authorization") String token) {
+        if (authService.isAdminUser(token)) {
             ErrorResponse error = new ErrorResponse();
-            error.set("This is not your basket");
+            error.set("You do not have access to edit orders");
             return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
         }
         Order orderToUpdate = this.orderRepository.findById(orderId).orElse(null);

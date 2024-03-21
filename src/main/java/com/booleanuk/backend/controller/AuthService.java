@@ -23,12 +23,7 @@ public class AuthService {
     RoleRepository roleRepository;
 
     public boolean hasAccessToResource(String token, int id) {
-        String username = this.jwtUtils.getUserNameFromJwtToken(token.substring(7));
-        User user = this.userRepository.findByUsername(username).orElse(null);
-
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "User was not found");
-        }
+        User user = getUserFromToken(token);
 
         Role adminRole = roleRepository.findByName(ERole.ROLE_USER).orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Role was not found"));
 
@@ -37,5 +32,28 @@ public class AuthService {
         } else {
             return false;
         }
+    }
+
+    public boolean isAdminUser(String token) {
+        User user = getUserFromToken(token);
+
+        Role adminRole = roleRepository.findByName(ERole.ROLE_USER).orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Role was not found"));
+
+        if (user.getRoles().stream().anyMatch(role -> role.getName() == ERole.ROLE_ADMIN)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    public User getUserFromToken(String token) {
+        String username = this.jwtUtils.getUserNameFromJwtToken(token.substring(7));
+        User user = this.userRepository.findByUsername(username).orElse(null);
+
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "User was not found");
+        }
+        return user;
     }
 }
